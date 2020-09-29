@@ -14,6 +14,8 @@ const axios = require('axios');
 const { google } = require('googleapis');
 const Quickbooks = require('node-quickbooks');
 const validator = require('validator');
+const fs = require('fs');
+const { v4: uuidv4 } = require('uuid');
 
 Quickbooks.setOauthVersion('2.0');
 
@@ -300,6 +302,24 @@ exports.postTwitter = (req, res, next) => {
     if (err) { return next(err); }
     req.flash('success', { msg: 'Your tweet has been posted.' });
     res.redirect('/api/twitter');
+  });
+};
+
+/**
+ * POST /api/writeToFile
+ * Post writeToFile
+ */
+exports.writeToFile = (req, res, next) => {
+  console.log('hrv ', req.body);
+  const uuidStr = uuidv4();
+  fs.writeFile(`/Users/padmashree/Downloads/${uuidStr}.json`, JSON.stringify(req.body), (err) => {
+    res.setHeader('Content-Type', 'application/json');
+    if (!err) {
+      res.end(JSON.stringify({ status: 0 }));
+    } else {
+      res.end(JSON.stringify({ status: 1 }));
+      return next(err);
+    }
   });
 };
 
